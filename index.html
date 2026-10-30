@@ -5,37 +5,124 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nexora</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#090817;color:white;font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* Login */
+#authScreen{
+ min-height:100vh;display:flex;align-items:center;
+ justify-content:center;padding:20px;
+ background:radial-gradient(ellipse at top,#39205f,#090817 65%);
+}
+.auth-card{
+ width:100%;max-width:400px;background:#151127;
+ padding:30px;border:1px solid #49366c;border-radius:18px;
+ box-shadow:0 15px 60px #0008;
+}
+.brand{text-align:center;font-size:34px;font-weight:900;
+ letter-spacing:4px;background:linear-gradient(90deg,#d946ef,#38bdf8);
+ color:transparent;background-clip:text}
+.auth-card p{text-align:center;color:#aaa2c4}
+.auth-card input{
+ width:100%;padding:14px;margin:8px 0;
+ background:#090817;border:1px solid #393052;
+ border-radius:9px;color:white;outline:none
+}
+.primary{
+ width:100%;padding:13px;border:0;border-radius:9px;
+ background:linear-gradient(90deg,#9333ea,#2563eb);
+ color:white;font-weight:bold;margin-top:10px
+}
+.switch{text-align:center;margin-top:18px;color:#aaa2c4}
+.switch button{background:none;border:0;color:#c084fc}
+#authStatus{font-size:13px;color:#fca5a5;min-height:20px}
+
+/* Chat */
 .app{display:flex;height:100vh}
-.servers{width:65px;background:#070612;padding:12px;display:flex;flex-direction:column;gap:12px;align-items:center}
-.logo{width:43px;height:43px;border-radius:15px;background:linear-gradient(135deg,#a855f7,#2563eb);display:grid;place-items:center;font-size:24px;font-weight:bold}
-.server{width:42px;height:42px;border:0;border-radius:14px;background:#201b38;color:white;font-size:20px;cursor:pointer}
-.sidebar{width:230px;background:#100e20;padding:20px 14px;border-right:1px solid #30264c}
-.brand{font-size:25px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#d946ef,#38bdf8);color:transparent;background-clip:text}
-.cover{width:100%;height:115px;object-fit:cover;border-radius:12px;margin:20px 0}
+.servers{width:65px;background:#070612;padding:12px;
+ display:flex;flex-direction:column;gap:12px;align-items:center}
+.logo{width:43px;height:43px;border-radius:15px;
+ background:linear-gradient(135deg,#a855f7,#2563eb);
+ display:grid;place-items:center;font-size:24px;font-weight:bold}
+.server{width:42px;height:42px;border:0;border-radius:14px;
+ background:#201b38;color:white;font-size:20px}
+.sidebar{width:230px;background:#100e20;padding:20px 14px;
+ border-right:1px solid #30264c}
+.sidebar .brand{font-size:25px;text-align:left}
+.cover{width:100%;height:115px;object-fit:cover;
+ border-radius:12px;margin:20px 0}
 .heading{font-size:11px;color:#9188ad;margin:18px 8px 8px;letter-spacing:2px}
-.channel{width:100%;padding:11px;border:0;border-radius:8px;background:none;color:#aaa2c4;text-align:left;cursor:pointer;font-size:14px}
+.channel{width:100%;padding:11px;border:0;border-radius:8px;
+ background:none;color:#aaa2c4;text-align:left}
 .channel:hover,.channel.active{background:#292044;color:white}
 .profile{position:absolute;bottom:15px;color:#b9b1d0;font-size:13px}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{height:60px;border-bottom:1px solid #29213e;padding:20px;font-weight:bold}
-.banner{margin:20px;height:175px;border-radius:16px;background:linear-gradient(90deg,#090817dd,#09081733),url('nexora-cover.png') center/cover;display:flex;align-items:center;padding:25px;border:1px solid #6341a0}
+.top{height:60px;border-bottom:1px solid #29213e;
+ padding:20px;display:flex;justify-content:space-between}
+.banner{margin:20px;height:175px;border-radius:16px;
+ background:linear-gradient(90deg,#090817dd,#09081733),
+ url('nexora-cover.png') center/cover;
+ display:flex;align-items:center;padding:25px;border:1px solid #6341a0}
 .banner h1{font-size:38px;margin:0}
 .banner p{color:#d5c8ff}
 .chat{flex:1;padding:22px;overflow-y:auto}
 .message{margin-bottom:20px;display:flex;gap:12px}
-.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#2563eb);display:grid;place-items:center;font-weight:bold;flex-shrink:0}
-.message p{margin:5px 0;color:#d0c9e3}
+.avatar{width:38px;height:38px;border-radius:50%;
+ background:linear-gradient(135deg,#a855f7,#2563eb);
+ display:grid;place-items:center;font-weight:bold;flex-shrink:0}
+.message p{margin:5px 0;color:#d0c9e3;overflow-wrap:anywhere}
+.message small{color:#817b9f;margin-left:8px}
 .composer{display:flex;gap:10px;padding:15px 22px}
-input{flex:1;min-width:0;padding:15px;border-radius:10px;background:#201b35;border:1px solid #393052;color:white;outline:none}
-button.send{border:0;border-radius:10px;padding:0 22px;background:linear-gradient(90deg,#9333ea,#2563eb);color:white;font-weight:bold;cursor:pointer}
-@media(max-width:600px){.sidebar{width:165px}.servers{width:50px;padding:7px}.banner{height:130px;margin:12px}.banner h1{font-size:25px}}
+.composer input{flex:1;min-width:0;padding:15px;
+ border-radius:10px;background:#201b35;border:1px solid #393052;
+ color:white;outline:none}
+.send{border:0;border-radius:10px;padding:0 22px;
+ background:linear-gradient(90deg,#9333ea,#2563eb);
+ color:white;font-weight:bold}
+.logout{background:#292044;border:1px solid #51416e;
+ color:white;border-radius:7px;padding:7px 10px}
+#chatStatus{padding:0 22px 8px;color:#aaa2c4;font-size:12px}
+@media(max-width:600px){
+ .sidebar{width:165px}.servers{width:50px;padding:7px}
+ .banner{height:130px;margin:12px}.banner h1{font-size:25px}
+}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- LOGIN / SIGNUP -->
+<section id="authScreen">
+ <div class="auth-card">
+  <div class="brand">NEXORA</div>
+  <p>Your people. Your games. Your community.</p>
+
+  <form id="authForm">
+   <div id="nameField" class="hidden">
+    <input id="displayName" placeholder="Your display name"
+     maxlength="24" autocomplete="nickname">
+   </div>
+   <input id="email" type="email" placeholder="Email address"
+    autocomplete="email" required>
+   <input id="password" type="password" placeholder="Password"
+    minlength="8" autocomplete="current-password" required>
+   <button class="primary" id="authButton">Login</button>
+  </form>
+
+  <div id="authStatus"></div>
+  <div class="switch">
+   <span id="switchText">Don't have an account?</span>
+   <button id="switchMode" type="button">Sign up</button>
+  </div>
+ </div>
+</section>
+
+<!-- MAIN CHAT -->
+<div class="app hidden" id="app">
  <aside class="servers">
   <div class="logo">N</div>
   <button class="server">🎮</button>
@@ -53,65 +140,263 @@ button.send{border:0;border-radius:10px;padding:0 22px;background:linear-gradien
   <button class="channel" data-name="music">♫ music</button>
   <div class="heading">VOICE CHANNELS</div>
   <button class="channel" data-name="hangout">🔊 Hangout</button>
-  <div class="profile">🟢 Low · Online</div>
+  <div class="profile">
+   🟢 <span id="profileName">User</span>
+   <br><br>
+   <button class="logout" id="logout">Log out</button>
+  </div>
  </aside>
 
  <main class="main">
-  <div class="top"># <span id="channelName">general</span></div>
+  <div class="top">
+   <b># <span id="channelName">general</span></b>
+   <span style="color:#86efac">● Online</span>
+  </div>
   <section class="banner">
    <div>
     <h1>Welcome to Nexora</h1>
     <p>Your people. Your games. Your community.</p>
    </div>
   </section>
-  <section class="chat" id="chat">
-   <div class="message">
-    <div class="avatar">N</div>
-    <div><b>Nexora Bot</b><p>Welcome to Nexora! Have fun ✨</p></div>
-   </div>
-  </section>
-  <form class="composer" id="form">
-   <input id="message" maxlength="500" placeholder="Message #general..." autocomplete="off">
+  <section class="chat" id="chat"></section>
+  <div id="chatStatus">Connecting...</div>
+  <form class="composer" id="chatForm">
+   <input id="message" maxlength="1000"
+    placeholder="Message #general..." autocomplete="off">
    <button class="send">Send ➤</button>
   </form>
  </main>
 </div>
 
 <script>
-const chat=document.getElementById('chat');
-const input=document.getElementById('message');
+// ADD YOUR SUPABASE DETAILS HERE
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 
-document.querySelectorAll('.channel').forEach(button=>{
- button.onclick=()=>{
-  document.querySelectorAll('.channel').forEach(b=>b.classList.remove('active'));
-  button.classList.add('active');
-  const name=button.dataset.name;
-  document.getElementById('channelName').textContent=name;
-  input.placeholder='Message #'+name+'...';
-  chat.innerHTML='';
+const supabaseClient = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+let currentUser = null;
+let currentChannel = "general";
+let realtimeSubscription = null;
+let signupMode = false;
+
+const $ = id => document.getElementById(id);
+
+function setStatus(message){
+ $("authStatus").textContent = message;
+}
+
+$("switchMode").onclick = () => {
+ signupMode = !signupMode;
+ $("nameField").classList.toggle("hidden",!signupMode);
+ $("authButton").textContent = signupMode ? "Create account" : "Login";
+ $("switchText").textContent = signupMode
+  ? "Already have an account?"
+  : "Don't have an account?";
+ $("switchMode").textContent = signupMode ? "Login" : "Sign up";
+ $("password").autocomplete = signupMode ? "new-password" : "current-password";
+ setStatus("");
+};
+
+$("authForm").onsubmit = async event => {
+ event.preventDefault();
+ setStatus("Please wait...");
+ $("authButton").disabled = true;
+
+ try{
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  let result;
+
+  if(signupMode){
+   const username = $("displayName").value.trim();
+
+   if(!username){
+    setStatus("Please enter a display name.");
+    return;
+   }
+
+   result = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options:{
+     data:{display_name:username}
+    }
+   });
+  }else{
+   result = await supabaseClient.auth.signInWithPassword({
+    email,password
+   });
+  }
+
+  if(result.error) throw result.error;
+
+  if(signupMode && !result.data.session){
+   setStatus("Account created! Check your email to confirm it, then log in.");
+  }else if(result.data.session){
+   await showChat(result.data.user);
+  }
+ }catch(error){
+  setStatus(error.message);
+ }finally{
+  $("authButton").disabled = false;
+ }
+};
+
+async function showChat(user){
+ currentUser = user;
+ const metadata = user.user_metadata || {};
+ const username = metadata.display_name || "Nexora User";
+
+ $("profileName").textContent = username;
+ $("authScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+
+ await loadMessages();
+
+ if(realtimeSubscription){
+  await supabaseClient.removeChannel(realtimeSubscription);
+ }
+
+ realtimeSubscription = supabaseClient
+  .channel("nexora-live-chat")
+  .on("postgres_changes",{
+   event:"INSERT",
+   schema:"public",
+   table:"messages",
+   filter:`channel=eq.${currentChannel}`
+  },() => loadMessages())
+  .subscribe(status => {
+   $("chatStatus").textContent =
+    status === "SUBSCRIBED"
+     ? "Live chat connected"
+     : "Chat connection: " + status;
+  });
+}
+
+async function loadMessages(){
+ const {data,error} = await supabaseClient
+  .from("messages")
+  .select("*")
+  .eq("channel",currentChannel)
+  .order("created_at",{ascending:true})
+  .limit(100);
+
+ if(error){
+  $("chatStatus").textContent = error.message;
+  return;
+ }
+
+ $("chat").replaceChildren();
+
+ data.forEach(message => {
+  const row = document.createElement("div");
+  row.className = "message";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = (message.username || "N").charAt(0).toUpperCase();
+
+  const content = document.createElement("div");
+  const name = document.createElement("b");
+  name.textContent = message.username;
+
+  const time = document.createElement("small");
+  time.textContent = new Date(message.created_at).toLocaleTimeString();
+
+  const text = document.createElement("p");
+  text.textContent = message.content;
+
+  content.append(name,time,text);
+  row.append(avatar,content);
+  $("chat").append(row);
+ });
+
+ $("chat").scrollTop = $("chat").scrollHeight;
+}
+
+$("chatForm").onsubmit = async event => {
+ event.preventDefault();
+
+ const content = $("message").value.trim();
+ if(!content || !currentUser) return;
+
+ const username =
+  currentUser.user_metadata?.display_name || "Nexora User";
+
+ const {error} = await supabaseClient
+  .from("messages")
+  .insert({
+   user_id:currentUser.id,
+   username,
+   channel:currentChannel,
+   content
+  });
+
+ if(error){
+  $("chatStatus").textContent = error.message;
+  return;
+ }
+
+ $("message").value = "";
+ await loadMessages();
+};
+
+document.querySelectorAll(".channel").forEach(button=>{
+ button.onclick = async ()=>{
+  document.querySelectorAll(".channel")
+   .forEach(b=>b.classList.remove("active"));
+
+  button.classList.add("active");
+  currentChannel = button.dataset.name;
+  $("channelName").textContent = currentChannel;
+  $("message").placeholder = "Message #" + currentChannel + "...";
+
+  if(realtimeSubscription){
+   await supabaseClient.removeChannel(realtimeSubscription);
+   realtimeSubscription = null;
+  }
+
+  await loadMessages();
+
+  realtimeSubscription = supabaseClient
+   .channel("nexora-" + currentChannel)
+   .on("postgres_changes",{
+    event:"INSERT",
+    schema:"public",
+    table:"messages",
+    filter:`channel=eq.${currentChannel}`
+   },()=>loadMessages())
+   .subscribe();
  };
 });
 
-document.getElementById('form').onsubmit=e=>{
- e.preventDefault();
- const value=input.value.trim();
- if(!value)return;
- const row=document.createElement('div');
- row.className='message';
- const avatar=document.createElement('div');
- avatar.className='avatar';
- avatar.textContent='L';
- const content=document.createElement('div');
- const username=document.createElement('b');
- username.textContent='Low';
- const message=document.createElement('p');
- message.textContent=value;
- content.append(username,message);
- row.append(avatar,content);
- chat.append(row);
- input.value='';
- chat.scrollTop=chat.scrollHeight;
+$("logout").onclick = async ()=>{
+ if(realtimeSubscription){
+  await supabaseClient.removeChannel(realtimeSubscription);
+  realtimeSubscription = null;
+ }
+ await supabaseClient.auth.signOut();
+ currentUser = null;
+ $("app").classList.add("hidden");
+ $("authScreen").classList.remove("hidden");
 };
+
+async function start(){
+ const {data,error} = await supabaseClient.auth.getSession();
+ if(error){
+  setStatus(error.message);
+  return;
+ }
+ if(data.session){
+  await showChat(data.session.user);
+ }
+}
+
+start();
 </script>
 </body>
 </html>
