@@ -3,307 +3,220 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nexora</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#11101a;color:#fff;font-family:Arial,sans-serif}
+body{margin:0;background:#11101a;color:white;font-family:Arial,sans-serif}
 button,input{font:inherit}
-button{cursor:pointer;border:0;border-radius:8px;padding:12px;background:#7654dc;color:white}
+button{cursor:pointer;border:0;border-radius:9px;padding:12px;background:#7955df;color:white}
 button:hover{filter:brightness(1.15)}
-input{background:#211e30;border:1px solid #39334d;color:white;padding:13px;border-radius:8px;width:100%;margin:7px 0}
-#auth{max-width:390px;margin:9vh auto;padding:30px;background:#191725;border:1px solid #302b42;border-radius:16px}
-#auth h1{text-align:center;color:#a78bfa}
-#auth button{width:100%;margin-top:9px}
+input{width:100%;padding:13px;margin:7px 0;background:#211e30;border:1px solid #39334d;border-radius:9px;color:white}
+#auth{width:min(390px,92%);margin:9vh auto;padding:28px;background:#191725;border:1px solid #302b42;border-radius:18px}
+#auth h1{text-align:center;color:#a78bfa;font-size:32px}
+#auth button{width:100%;margin-top:10px}
 .google{background:white;color:#222}
-.google img{width:18px;vertical-align:middle;margin-right:9px}
-#app{display:none;height:100vh}
-.sidebar{width:230px;background:#191725;padding:18px;display:flex;flex-direction:column}
-.brand{font-size:25px;font-weight:bold;color:#a78bfa;margin:8px 0 30px}
-.channel{background:transparent;text-align:left;color:#bbb;width:100%;margin:3px 0}
+.google img{width:19px;vertical-align:middle;margin-right:9px}
+#status{color:#fca5a5;font-size:13px}
+#app{display:none;height:100dvh}
+.sidebar{width:225px;background:#191725;padding:18px;display:flex;flex-direction:column}
+.brand{font-size:26px;font-weight:bold;color:#a78bfa;margin:8px 0 25px}
+.channel{display:block;width:100%;text-align:left;background:transparent;color:#aaa;margin:4px 0}
 .channel.active,.channel:hover{background:#302747;color:white}
+.profile{margin-top:auto;color:#aaa;overflow-wrap:anywhere}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:18px;border-bottom:1px solid #302b42;font-weight:bold}
+.top{padding:19px;border-bottom:1px solid #302b42;font-weight:bold}
 .messages{flex:1;overflow-y:auto;padding:20px}
 .message{padding:12px;margin-bottom:12px;background:#1d1a2a;border-radius:10px;overflow-wrap:anywhere}
 .message strong{color:#b49aff}
-.message small{color:#817b94;margin-left:8px}
+.message small{color:#888;margin-left:10px}
 .composer{display:flex;gap:10px;padding:15px;border-top:1px solid #302b42}
 .composer input{margin:0}
-.profile{margin-top:auto;color:#aaa;font-size:13px;overflow-wrap:anywhere}
-@media(max-width:650px){
+@media(max-width:600px){
 #app{flex-direction:column}
 .sidebar{width:100%;padding:10px}
 .brand{margin:5px}
-.channels{display:flex;overflow-x:auto}
+#channels{display:flex;overflow-x:auto}
 .channel{min-width:max-content;width:auto}
 .profile{display:none}
 }
 </style>
 </head>
 <body>
-
 <section id="auth">
 <h1>NEXORA</h1>
 <p style="text-align:center;color:#aaa">Your place to connect.</p>
+<input id="name" placeholder="Display name (for registration)">
 <input id="email" type="email" placeholder="Email address">
 <input id="password" type="password" placeholder="Password">
-<input id="displayName" placeholder="Display name (for sign-up)">
 <button onclick="signUp()">Create account</button>
 <button onclick="signIn()">Log in</button>
 <button class="google" onclick="googleLogin()">
 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
 Continue with Google
 </button>
-<p id="authStatus" style="color:#fca5a5"></p>
+<p id="status"></p>
 </section>
 
 <section id="app">
 <aside class="sidebar">
 <div class="brand">NEXORA</div>
-<div class="channels" id="channels"></div>
+<div id="channels"></div>
 <div class="profile">
 <p id="profileName"></p>
 <button onclick="logOut()">Log out</button>
 </div>
 </aside>
-
 <main class="main">
 <header class="top" id="channelTitle"># general</header>
 <div class="messages" id="messages"></div>
 <form class="composer" onsubmit="sendMessage(event)">
-<input id="messageInput" placeholder="Message #general..." maxlength="1000" autocomplete="off">
-<button type="submit">Send</button>
+<input id="messageInput" maxlength="1000" placeholder="Write a message..." autocomplete="off">
+<button>Send</button>
 </form>
 </main>
 </section>
 
 <script>
 const SUPABASE_URL = "https://qinygfihuqktnokzxmrt.supabase.co";
-const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+const SUPABASE_KEY = "sb_publishable_anLj1LjbDtSSeCGRJPc-zw_u2ghYdkC";
 
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const channelNames = ["general","gaming","memes","music","hangout"];
-let currentChannel = "general";
-let currentUser = null;
-let messageSubscription = null;
+const channels=["general","gaming","memes","music","hangout"];
+let currentChannel="general";
+let currentUser=null;
+let subscription=null;
+const $=id=>document.getElementById(id);
 
-const authBox = document.getElementById("auth");
-const app = document.getElementById("app");
-const authStatus = document.getElementById("authStatus");
-
-function showError(message){
-  authStatus.textContent = message;
-}
+function status(message){$("status").textContent=message;}
 
 async function signUp(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const name = document.getElementById("displayName").value.trim();
-
-  if(!email || !password || !name){
-    return showError("Enter your email, password and display name.");
-  }
-
-  const {error} = await supabase.auth.signUp({
-    email,
-    password,
-    options:{
-      data:{display_name:name}
-    }
-  });
-
-  if(error) return showError(error.message);
-  showError("Account created! Check your email if confirmation is required.");
+ const email=$("email").value.trim();
+ const password=$("password").value;
+ const name=$("name").value.trim();
+ if(!email||!password||!name)return status("Complete all fields.");
+ const {error}=await supabase.auth.signUp({
+  email,password,options:{data:{display_name:name}}
+ });
+ if(error)return status(error.message);
+ status("Account created! Check your email if confirmation is required.");
 }
 
 async function signIn(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  const {error} = await supabase.auth.signInWithPassword({
-    email,password
-  });
-
-  if(error) showError(error.message);
+ const {error}=await supabase.auth.signInWithPassword({
+  email:$("email").value.trim(),
+  password:$("password").value
+ });
+ if(error)status(error.message);
 }
 
 async function googleLogin(){
-  const {error} = await supabase.auth.signInWithOAuth({
-    provider:"google",
-    options:{
-      redirectTo:window.location.origin
-    }
-  });
-
-  if(error) showError(error.message);
+ status("");
+ const {error}=await supabase.auth.signInWithOAuth({
+  provider:"google",
+  options:{redirectTo:window.location.origin}
+ });
+ if(error)status("Google login failed: "+error.message);
 }
 
-async function logOut(){
-  await supabase.auth.signOut();
-}
-
-function renderChannels(){
-  const container = document.getElementById("channels");
-  container.innerHTML = "";
-
-  channelNames.forEach(name=>{
-    const button = document.createElement("button");
-    button.className = "channel" + (name===currentChannel?" active":"");
-    button.textContent = "# " + name;
-    button.onclick = ()=>selectChannel(name);
-    container.appendChild(button);
-  });
-}
-
-async function selectChannel(name){
-  currentChannel = name;
-  document.getElementById("channelTitle").textContent = "# " + name;
-  document.getElementById("messageInput").placeholder = "Message #" + name + "...";
-  renderChannels();
-  await loadMessages();
-  subscribeToMessages();
-}
-
-async function loadMessages(){
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-
-  const {data,error} = await supabase
-    .from("messages")
-    .select("*")
-    .eq("channel",currentChannel)
-    .order("created_at",{ascending:true})
-    .limit(100);
-
-  if(error){
-    box.textContent = "Could not load messages: " + error.message;
-    return;
-  }
-
-  data.forEach(addMessage);
-  box.scrollTop = box.scrollHeight;
-}
-
-function addMessage(message){
-  const box = document.getElementById("messages");
-  const item = document.createElement("div");
-  item.className = "message";
-
-  const username = document.createElement("strong");
-  username.textContent = message.username || "User";
-
-  const time = document.createElement("small");
-  time.textContent = new Date(message.created_at).toLocaleTimeString();
-
-  const content = document.createElement("div");
-  content.textContent = message.content;
-
-  item.append(username,time,content);
-  box.appendChild(item);
-}
-
-async function sendMessage(event){
-  event.preventDefault();
-
-  const input = document.getElementById("messageInput");
-  const content = input.value.trim();
-
-  if(!content || !currentUser) return;
-
-  input.value = "";
-
-  const username =
-    currentUser.user_metadata?.display_name ||
-    currentUser.email?.split("@")[0] ||
-    "User";
-
-  const {error} = await supabase.from("messages").insert({
-    user_id:currentUser.id,
-    username,
-    channel:currentChannel,
-    content
-  });
-
-  if(error){
-    input.value = content;
-    alert("Message failed: " + error.message);
-  }
-}
-
-function subscribeToMessages(){
-  if(messageSubscription){
-    supabase.removeChannel(messageSubscription);
-  }
-
-  messageSubscription = supabase
-    .channel("messages-" + currentChannel)
-    .on(
-      "postgres_changes",
-      {
-        event:"INSERT",
-        schema:"public",
-        table:"messages",
-        filter:"channel=eq." + currentChannel
-      },
-      payload=>{
-        addMessage(payload.new);
-        const box = document.getElementById("messages");
-        box.scrollTop = box.scrollHeight;
-      }
-    )
-    .subscribe();
-}
+async function logOut(){await supabase.auth.signOut();}
 
 function showApp(user){
-  currentUser = user;
-  authBox.style.display = "none";
-  app.style.display = "flex";
-
-  document.getElementById("profileName").textContent =
-    user.user_metadata?.display_name || user.email || "Logged in";
-
-  renderChannels();
-  selectChannel("general");
+ currentUser=user;
+ $("auth").style.display="none";
+ $("app").style.display="flex";
+ $("profileName").textContent=user.user_metadata?.display_name||user.email||"Nexora user";
+ renderChannels();
+ selectChannel("general");
 }
 
 function showLogin(){
-  currentUser = null;
-  authBox.style.display = "block";
-  app.style.display = "none";
+ currentUser=null;
+ $("auth").style.display="block";
+ $("app").style.display="none";
+ if(subscription){supabase.removeChannel(subscription);subscription=null;}
+}
 
-  if(messageSubscription){
-    supabase.removeChannel(messageSubscription);
-    messageSubscription = null;
-  }
+function renderChannels(){
+ $("channels").innerHTML="";
+ channels.forEach(channel=>{
+  const button=document.createElement("button");
+  button.className="channel"+(channel===currentChannel?" active":"");
+  button.textContent="# "+channel;
+  button.onclick=()=>selectChannel(channel);
+  $("channels").appendChild(button);
+ });
+}
+
+async function selectChannel(channel){
+ currentChannel=channel;
+ $("channelTitle").textContent="# "+channel;
+ $("messageInput").placeholder="Message #"+channel+"...";
+ renderChannels();
+ await loadMessages();
+ subscribeMessages();
+}
+
+async function loadMessages(){
+ $("messages").innerHTML="";
+ const {data,error}=await supabase.from("messages")
+  .select("*").eq("channel",currentChannel)
+  .order("created_at",{ascending:true}).limit(100);
+ if(error){$("messages").textContent=error.message;return;}
+ data.forEach(addMessage);
+ $("messages").scrollTop=$("messages").scrollHeight;
+}
+
+function addMessage(message){
+ const item=document.createElement("div");
+ item.className="message";
+ const username=document.createElement("strong");
+ username.textContent=message.username||"User";
+ const time=document.createElement("small");
+ time.textContent=new Date(message.created_at).toLocaleTimeString();
+ const content=document.createElement("div");
+ content.textContent=message.content;
+ item.append(username,time,content);
+ $("messages").appendChild(item);
+}
+
+async function sendMessage(event){
+ event.preventDefault();
+ const input=$("messageInput");
+ const content=input.value.trim();
+ if(!content||!currentUser)return;
+ const username=currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"User";
+ const {error}=await supabase.from("messages").insert({
+  user_id:currentUser.id,username,channel:currentChannel,content
+ });
+ if(error)alert("Message error: "+error.message);
+ else input.value="";
+}
+
+function subscribeMessages(){
+ if(subscription)supabase.removeChannel(subscription);
+ subscription=supabase.channel("chat-"+currentChannel)
+ .on("postgres_changes",{
+  event:"INSERT",schema:"public",table:"messages",
+  filter:"channel=eq."+currentChannel
+ },payload=>{
+  addMessage(payload.new);
+  $("messages").scrollTop=$("messages").scrollHeight;
+ }).subscribe();
 }
 
 supabase.auth.onAuthStateChange((event,session)=>{
-  if(session?.user){
-    showApp(session.user);
-  }else{
-    showLogin();
-  }
+ if(session?.user)showApp(session.user);
+ else showLogin();
 });
 
 async function restoreSession(){
-  const {data,error} = await supabase.auth.getSession();
-
-  if(error){
-    showError(error.message);
-    return;
-  }
-
-  if(data.session?.user){
-    showApp(data.session.user);
-  }
+ const {data,error}=await supabase.auth.getSession();
+ if(error)return status(error.message);
+ if(data.session?.user)showApp(data.session.user);
 }
-
 restoreSession();
 </script>
 </body>
