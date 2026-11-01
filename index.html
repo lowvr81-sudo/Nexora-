@@ -3,400 +3,308 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexora</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090817;color:white;font-family:Arial,sans-serif}
+body{margin:0;background:#11101a;color:#fff;font-family:Arial,sans-serif}
 button,input{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-
-/* Login */
-#authScreen{
- min-height:100vh;display:flex;align-items:center;
- justify-content:center;padding:20px;
- background:radial-gradient(ellipse at top,#39205f,#090817 65%);
-}
-.auth-card{
- width:100%;max-width:400px;background:#151127;
- padding:30px;border:1px solid #49366c;border-radius:18px;
- box-shadow:0 15px 60px #0008;
-}
-.brand{text-align:center;font-size:34px;font-weight:900;
- letter-spacing:4px;background:linear-gradient(90deg,#d946ef,#38bdf8);
- color:transparent;background-clip:text}
-.auth-card p{text-align:center;color:#aaa2c4}
-.auth-card input{
- width:100%;padding:14px;margin:8px 0;
- background:#090817;border:1px solid #393052;
- border-radius:9px;color:white;outline:none
-}
-.primary{
- width:100%;padding:13px;border:0;border-radius:9px;
- background:linear-gradient(90deg,#9333ea,#2563eb);
- color:white;font-weight:bold;margin-top:10px
-}
-.switch{text-align:center;margin-top:18px;color:#aaa2c4}
-.switch button{background:none;border:0;color:#c084fc}
-#authStatus{font-size:13px;color:#fca5a5;min-height:20px}
-
-/* Chat */
-.app{display:flex;height:100vh}
-.servers{width:65px;background:#070612;padding:12px;
- display:flex;flex-direction:column;gap:12px;align-items:center}
-.logo{width:43px;height:43px;border-radius:15px;
- background:linear-gradient(135deg,#a855f7,#2563eb);
- display:grid;place-items:center;font-size:24px;font-weight:bold}
-.server{width:42px;height:42px;border:0;border-radius:14px;
- background:#201b38;color:white;font-size:20px}
-.sidebar{width:230px;background:#100e20;padding:20px 14px;
- border-right:1px solid #30264c}
-.sidebar .brand{font-size:25px;text-align:left}
-.cover{width:100%;height:115px;object-fit:cover;
- border-radius:12px;margin:20px 0}
-.heading{font-size:11px;color:#9188ad;margin:18px 8px 8px;letter-spacing:2px}
-.channel{width:100%;padding:11px;border:0;border-radius:8px;
- background:none;color:#aaa2c4;text-align:left}
-.channel:hover,.channel.active{background:#292044;color:white}
-.profile{position:absolute;bottom:15px;color:#b9b1d0;font-size:13px}
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{height:60px;border-bottom:1px solid #29213e;
- padding:20px;display:flex;justify-content:space-between}
-.banner{margin:20px;height:175px;border-radius:16px;
- background:linear-gradient(90deg,#090817dd,#09081733),
- url('nexora-cover.png') center/cover;
- display:flex;align-items:center;padding:25px;border:1px solid #6341a0}
-.banner h1{font-size:38px;margin:0}
-.banner p{color:#d5c8ff}
-.chat{flex:1;padding:22px;overflow-y:auto}
-.message{margin-bottom:20px;display:flex;gap:12px}
-.avatar{width:38px;height:38px;border-radius:50%;
- background:linear-gradient(135deg,#a855f7,#2563eb);
- display:grid;place-items:center;font-weight:bold;flex-shrink:0}
-.message p{margin:5px 0;color:#d0c9e3;overflow-wrap:anywhere}
-.message small{color:#817b9f;margin-left:8px}
-.composer{display:flex;gap:10px;padding:15px 22px}
-.composer input{flex:1;min-width:0;padding:15px;
- border-radius:10px;background:#201b35;border:1px solid #393052;
- color:white;outline:none}
-.send{border:0;border-radius:10px;padding:0 22px;
- background:linear-gradient(90deg,#9333ea,#2563eb);
- color:white;font-weight:bold}
-.logout{background:#292044;border:1px solid #51416e;
- color:white;border-radius:7px;padding:7px 10px}
-#chatStatus{padding:0 22px 8px;color:#aaa2c4;font-size:12px}
-@media(max-width:600px){
- .sidebar{width:165px}.servers{width:50px;padding:7px}
- .banner{height:130px;margin:12px}.banner h1{font-size:25px}
+button{cursor:pointer;border:0;border-radius:8px;padding:12px;background:#7654dc;color:white}
+button:hover{filter:brightness(1.15)}
+input{background:#211e30;border:1px solid #39334d;color:white;padding:13px;border-radius:8px;width:100%;margin:7px 0}
+#auth{max-width:390px;margin:9vh auto;padding:30px;background:#191725;border:1px solid #302b42;border-radius:16px}
+#auth h1{text-align:center;color:#a78bfa}
+#auth button{width:100%;margin-top:9px}
+.google{background:white;color:#222}
+.google img{width:18px;vertical-align:middle;margin-right:9px}
+#app{display:none;height:100vh}
+.sidebar{width:230px;background:#191725;padding:18px;display:flex;flex-direction:column}
+.brand{font-size:25px;font-weight:bold;color:#a78bfa;margin:8px 0 30px}
+.channel{background:transparent;text-align:left;color:#bbb;width:100%;margin:3px 0}
+.channel.active,.channel:hover{background:#302747;color:white}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{padding:18px;border-bottom:1px solid #302b42;font-weight:bold}
+.messages{flex:1;overflow-y:auto;padding:20px}
+.message{padding:12px;margin-bottom:12px;background:#1d1a2a;border-radius:10px;overflow-wrap:anywhere}
+.message strong{color:#b49aff}
+.message small{color:#817b94;margin-left:8px}
+.composer{display:flex;gap:10px;padding:15px;border-top:1px solid #302b42}
+.composer input{margin:0}
+.profile{margin-top:auto;color:#aaa;font-size:13px;overflow-wrap:anywhere}
+@media(max-width:650px){
+#app{flex-direction:column}
+.sidebar{width:100%;padding:10px}
+.brand{margin:5px}
+.channels{display:flex;overflow-x:auto}
+.channel{min-width:max-content;width:auto}
+.profile{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- LOGIN / SIGNUP -->
-<section id="authScreen">
- <div class="auth-card">
-  <div class="brand">NEXORA</div>
-  <p>Your people. Your games. Your community.</p>
-
-  <form id="authForm">
-   <div id="nameField" class="hidden">
-    <input id="displayName" placeholder="Your display name"
-     maxlength="24" autocomplete="nickname">
-   </div>
-   <input id="email" type="email" placeholder="Email address"
-    autocomplete="email" required>
-   <input id="password" type="password" placeholder="Password"
-    minlength="8" autocomplete="current-password" required>
-   <button class="primary" id="authButton">Login</button>
-  </form>
-
-  <div id="authStatus"></div>
-  <div class="switch">
-   <span id="switchText">Don't have an account?</span>
-   <button id="switchMode" type="button">Sign up</button>
-  </div>
- </div>
+<section id="auth">
+<h1>NEXORA</h1>
+<p style="text-align:center;color:#aaa">Your place to connect.</p>
+<input id="email" type="email" placeholder="Email address">
+<input id="password" type="password" placeholder="Password">
+<input id="displayName" placeholder="Display name (for sign-up)">
+<button onclick="signUp()">Create account</button>
+<button onclick="signIn()">Log in</button>
+<button class="google" onclick="googleLogin()">
+<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+Continue with Google
+</button>
+<p id="authStatus" style="color:#fca5a5"></p>
 </section>
 
-<!-- MAIN CHAT -->
-<div class="app hidden" id="app">
- <aside class="servers">
-  <div class="logo">N</div>
-  <button class="server">🎮</button>
-  <button class="server">✦</button>
-  <button class="server">＋</button>
- </aside>
-
- <aside class="sidebar">
-  <div class="brand">NEXORA</div>
-  <img class="cover" src="nexora-cover.png" alt="Nexora logo">
-  <div class="heading">COMMUNITY</div>
-  <button class="channel active" data-name="general"># general</button>
-  <button class="channel" data-name="gaming">🎮 gaming</button>
-  <button class="channel" data-name="memes">😂 memes</button>
-  <button class="channel" data-name="music">♫ music</button>
-  <div class="heading">VOICE CHANNELS</div>
-  <button class="channel" data-name="hangout">🔊 Hangout</button>
-  <div class="profile">
-   🟢 <span id="profileName">User</span>
-   <br><br>
-   <button class="logout" id="logout">Log out</button>
-  </div>
- </aside>
-
- <main class="main">
-  <div class="top">
-   <b># <span id="channelName">general</span></b>
-   <span style="color:#86efac">● Online</span>
-  </div>
-  <section class="banner">
-   <div>
-    <h1>Welcome to Nexora</h1>
-    <p>Your people. Your games. Your community.</p>
-   </div>
-  </section>
-  <section class="chat" id="chat"></section>
-  <div id="chatStatus">Connecting...</div>
-  <form class="composer" id="chatForm">
-   <input id="message" maxlength="1000"
-    placeholder="Message #general..." autocomplete="off">
-   <button class="send">Send ➤</button>
-  </form>
- </main>
+<section id="app">
+<aside class="sidebar">
+<div class="brand">NEXORA</div>
+<div class="channels" id="channels"></div>
+<div class="profile">
+<p id="profileName"></p>
+<button onclick="logOut()">Log out</button>
 </div>
+</aside>
+
+<main class="main">
+<header class="top" id="channelTitle"># general</header>
+<div class="messages" id="messages"></div>
+<form class="composer" onsubmit="sendMessage(event)">
+<input id="messageInput" placeholder="Message #general..." maxlength="1000" autocomplete="off">
+<button type="submit">Send</button>
+</form>
+</main>
+</section>
 
 <script>
-// ADD YOUR SUPABASE DETAILS HERE
 const SUPABASE_URL = "https://qinygfihuqktnokzxmrt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_anLj1LjbDtSSeCGRJPc-zw_u2ghYdkC";
+const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 
-const supabaseClient = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
-let currentUser = null;
+const channelNames = ["general","gaming","memes","music","hangout"];
 let currentChannel = "general";
-let realtimeSubscription = null;
-let signupMode = false;
+let currentUser = null;
+let messageSubscription = null;
 
-const $ = id => document.getElementById(id);
+const authBox = document.getElementById("auth");
+const app = document.getElementById("app");
+const authStatus = document.getElementById("authStatus");
 
-function setStatus(message){
- $("authStatus").textContent = message;
+function showError(message){
+  authStatus.textContent = message;
 }
 
-$("switchMode").onclick = () => {
- signupMode = !signupMode;
- $("nameField").classList.toggle("hidden",!signupMode);
- $("authButton").textContent = signupMode ? "Create account" : "Login";
- $("switchText").textContent = signupMode
-  ? "Already have an account?"
-  : "Don't have an account?";
- $("switchMode").textContent = signupMode ? "Login" : "Sign up";
- $("password").autocomplete = signupMode ? "new-password" : "current-password";
- setStatus("");
-};
+async function signUp(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const name = document.getElementById("displayName").value.trim();
 
-$("authForm").onsubmit = async event => {
- event.preventDefault();
- setStatus("Please wait...");
- $("authButton").disabled = true;
+  if(!email || !password || !name){
+    return showError("Enter your email, password and display name.");
+  }
 
- try{
-  const email = $("email").value.trim();
-  const password = $("password").value;
-  let result;
-
-  if(signupMode){
-   const username = $("displayName").value.trim();
-
-   if(!username){
-    setStatus("Please enter a display name.");
-    return;
-   }
-
-   result = await supabaseClient.auth.signUp({
+  const {error} = await supabase.auth.signUp({
     email,
     password,
     options:{
-     data:{display_name:username}
+      data:{display_name:name}
     }
-   });
-  }else{
-   result = await supabaseClient.auth.signInWithPassword({
+  });
+
+  if(error) return showError(error.message);
+  showError("Account created! Check your email if confirmation is required.");
+}
+
+async function signIn(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const {error} = await supabase.auth.signInWithPassword({
     email,password
-   });
-  }
+  });
 
-  if(result.error) throw result.error;
+  if(error) showError(error.message);
+}
 
-  if(signupMode && !result.data.session){
-   setStatus("Account created! Check your email to confirm it, then log in.");
-  }else if(result.data.session){
-   await showChat(result.data.user);
-  }
- }catch(error){
-  setStatus(error.message);
- }finally{
-  $("authButton").disabled = false;
- }
-};
+async function googleLogin(){
+  const {error} = await supabase.auth.signInWithOAuth({
+    provider:"google",
+    options:{
+      redirectTo:window.location.origin
+    }
+  });
 
-async function showChat(user){
- currentUser = user;
- const metadata = user.user_metadata || {};
- const username = metadata.display_name || "Nexora User";
+  if(error) showError(error.message);
+}
 
- $("profileName").textContent = username;
- $("authScreen").classList.add("hidden");
- $("app").classList.remove("hidden");
+async function logOut(){
+  await supabase.auth.signOut();
+}
 
- await loadMessages();
+function renderChannels(){
+  const container = document.getElementById("channels");
+  container.innerHTML = "";
 
- if(realtimeSubscription){
-  await supabaseClient.removeChannel(realtimeSubscription);
- }
-
- realtimeSubscription = supabaseClient
-  .channel("nexora-live-chat")
-  .on("postgres_changes",{
-   event:"INSERT",
-   schema:"public",
-   table:"messages",
-   filter:`channel=eq.${currentChannel}`
-  },() => loadMessages())
-  .subscribe(status => {
-   $("chatStatus").textContent =
-    status === "SUBSCRIBED"
-     ? "Live chat connected"
-     : "Chat connection: " + status;
+  channelNames.forEach(name=>{
+    const button = document.createElement("button");
+    button.className = "channel" + (name===currentChannel?" active":"");
+    button.textContent = "# " + name;
+    button.onclick = ()=>selectChannel(name);
+    container.appendChild(button);
   });
 }
 
+async function selectChannel(name){
+  currentChannel = name;
+  document.getElementById("channelTitle").textContent = "# " + name;
+  document.getElementById("messageInput").placeholder = "Message #" + name + "...";
+  renderChannels();
+  await loadMessages();
+  subscribeToMessages();
+}
+
 async function loadMessages(){
- const {data,error} = await supabaseClient
-  .from("messages")
-  .select("*")
-  .eq("channel",currentChannel)
-  .order("created_at",{ascending:true})
-  .limit(100);
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
 
- if(error){
-  $("chatStatus").textContent = error.message;
-  return;
- }
+  const {data,error} = await supabase
+    .from("messages")
+    .select("*")
+    .eq("channel",currentChannel)
+    .order("created_at",{ascending:true})
+    .limit(100);
 
- $("chat").replaceChildren();
+  if(error){
+    box.textContent = "Could not load messages: " + error.message;
+    return;
+  }
 
- data.forEach(message => {
-  const row = document.createElement("div");
-  row.className = "message";
+  data.forEach(addMessage);
+  box.scrollTop = box.scrollHeight;
+}
 
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = (message.username || "N").charAt(0).toUpperCase();
+function addMessage(message){
+  const box = document.getElementById("messages");
+  const item = document.createElement("div");
+  item.className = "message";
 
-  const content = document.createElement("div");
-  const name = document.createElement("b");
-  name.textContent = message.username;
+  const username = document.createElement("strong");
+  username.textContent = message.username || "User";
 
   const time = document.createElement("small");
   time.textContent = new Date(message.created_at).toLocaleTimeString();
 
-  const text = document.createElement("p");
-  text.textContent = message.content;
+  const content = document.createElement("div");
+  content.textContent = message.content;
 
-  content.append(name,time,text);
-  row.append(avatar,content);
-  $("chat").append(row);
- });
-
- $("chat").scrollTop = $("chat").scrollHeight;
+  item.append(username,time,content);
+  box.appendChild(item);
 }
 
-$("chatForm").onsubmit = async event => {
- event.preventDefault();
+async function sendMessage(event){
+  event.preventDefault();
 
- const content = $("message").value.trim();
- if(!content || !currentUser) return;
+  const input = document.getElementById("messageInput");
+  const content = input.value.trim();
 
- const username =
-  currentUser.user_metadata?.display_name || "Nexora User";
+  if(!content || !currentUser) return;
 
- const {error} = await supabaseClient
-  .from("messages")
-  .insert({
-   user_id:currentUser.id,
-   username,
-   channel:currentChannel,
-   content
+  input.value = "";
+
+  const username =
+    currentUser.user_metadata?.display_name ||
+    currentUser.email?.split("@")[0] ||
+    "User";
+
+  const {error} = await supabase.from("messages").insert({
+    user_id:currentUser.id,
+    username,
+    channel:currentChannel,
+    content
   });
 
- if(error){
-  $("chatStatus").textContent = error.message;
-  return;
- }
-
- $("message").value = "";
- await loadMessages();
-};
-
-document.querySelectorAll(".channel").forEach(button=>{
- button.onclick = async ()=>{
-  document.querySelectorAll(".channel")
-   .forEach(b=>b.classList.remove("active"));
-
-  button.classList.add("active");
-  currentChannel = button.dataset.name;
-  $("channelName").textContent = currentChannel;
-  $("message").placeholder = "Message #" + currentChannel + "...";
-
-  if(realtimeSubscription){
-   await supabaseClient.removeChannel(realtimeSubscription);
-   realtimeSubscription = null;
+  if(error){
+    input.value = content;
+    alert("Message failed: " + error.message);
   }
-
-  await loadMessages();
-
-  realtimeSubscription = supabaseClient
-   .channel("nexora-" + currentChannel)
-   .on("postgres_changes",{
-    event:"INSERT",
-    schema:"public",
-    table:"messages",
-    filter:`channel=eq.${currentChannel}`
-   },()=>loadMessages())
-   .subscribe();
- };
-});
-
-$("logout").onclick = async ()=>{
- if(realtimeSubscription){
-  await supabaseClient.removeChannel(realtimeSubscription);
-  realtimeSubscription = null;
- }
- await supabaseClient.auth.signOut();
- currentUser = null;
- $("app").classList.add("hidden");
- $("authScreen").classList.remove("hidden");
-};
-
-async function start(){
- const {data,error} = await supabaseClient.auth.getSession();
- if(error){
-  setStatus(error.message);
-  return;
- }
- if(data.session){
-  await showChat(data.session.user);
- }
 }
 
-start();
+function subscribeToMessages(){
+  if(messageSubscription){
+    supabase.removeChannel(messageSubscription);
+  }
+
+  messageSubscription = supabase
+    .channel("messages-" + currentChannel)
+    .on(
+      "postgres_changes",
+      {
+        event:"INSERT",
+        schema:"public",
+        table:"messages",
+        filter:"channel=eq." + currentChannel
+      },
+      payload=>{
+        addMessage(payload.new);
+        const box = document.getElementById("messages");
+        box.scrollTop = box.scrollHeight;
+      }
+    )
+    .subscribe();
+}
+
+function showApp(user){
+  currentUser = user;
+  authBox.style.display = "none";
+  app.style.display = "flex";
+
+  document.getElementById("profileName").textContent =
+    user.user_metadata?.display_name || user.email || "Logged in";
+
+  renderChannels();
+  selectChannel("general");
+}
+
+function showLogin(){
+  currentUser = null;
+  authBox.style.display = "block";
+  app.style.display = "none";
+
+  if(messageSubscription){
+    supabase.removeChannel(messageSubscription);
+    messageSubscription = null;
+  }
+}
+
+supabase.auth.onAuthStateChange((event,session)=>{
+  if(session?.user){
+    showApp(session.user);
+  }else{
+    showLogin();
+  }
+});
+
+async function restoreSession(){
+  const {data,error} = await supabase.auth.getSession();
+
+  if(error){
+    showError(error.message);
+    return;
+  }
+
+  if(data.session?.user){
+    showApp(data.session.user);
+  }
+}
+
+restoreSession();
 </script>
 </body>
 </html>
